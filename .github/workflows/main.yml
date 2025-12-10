@@ -11,15 +11,14 @@ jobs:
     steps:
       - name: Clone repo
         uses: actions/checkout@v2
-      - name: Build + Run FakeShop
+      - name: Build + Run PetStore
         run: |
-          docker pull edsonrsjr/fake-shop:latest
-          docker run -d -p 80:80 --name fakeshop edsonrsjr/fake-shop:latest
-
+          docker pull swaggerapi/petstore
+          docker run -d -e SWAGGER_URL=http://petstore:8080 -e SWAGGER_BASE_PATH=/v2 --name petstore swaggerapi/petstore
       - name: Run WAS
         run: |
-          docker pull tenable/was-scanner:latest
-          docker run -v $(pwd):/scanner -t -e WAS_MODE=cicd -e ACCESS_KEY=${ACCESS_KEY} -e SECRET_KEY=${SECRET_KEY} --link fakeshop tenable/was-scanner:latest || true
+          docker pull docker pull tenable/was-scanner:2.29.1-MASTER-I89-D241223-1638
+          docker run -v $(pwd):/scanner -t -e WAS_MODE=cicd -e ACCESS_KEY=${ACCESS_KEY} -e SECRET_KEY=${SECRET_KEY} --link petstore docker pull tenable/was-scanner:2.29.1-MASTER-I89-D241223-1638 || true
           ls $(pwd)
         env:
           ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
