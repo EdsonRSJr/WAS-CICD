@@ -14,11 +14,11 @@ jobs:
       - name: Build + Run PetStore
         run: |
           docker pull swaggerapi/petstore
-          docker run -d -e SWAGGER_URL=http://petstore:8080 -e SWAGGER_BASE_PATH=/v2 --name petstore swaggerapi/petstore
+          docker run -d -e SWAGGER_HOST=http://petstore.swagger.io -e SWAGGER_URL=http://localhost -e SWAGGER_BASE_PATH=/v2 -p 80:8080 --name petstore swaggerapi/petstore
       - name: Run WAS
         run: |
           docker pull tenable/was-scanner:latest
-          docker run -v $(pwd):/scanner -t -e WAS_MODE=cicd -e ACCESS_KEY=${ACCESS_KEY} -e SECRET_KEY=${SECRET_KEY} -e WAS_TARGET_URL="http://petstore:8080" --link petstore tenable/was-scanner:latest || true
+          docker run -v $(pwd):/scanner -t -e WAS_MODE=cicd -e ACCESS_KEY=${ACCESS_KEY} -e SECRET_KEY=${SECRET_KEY} --link petstore tenable/was-scanner:latest || true
           ls $(pwd)
         env:
           ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
